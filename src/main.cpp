@@ -2,6 +2,12 @@
 #include <string>
 #include <vector>
 
+enum GameState
+{
+    MENU,
+    GAME
+};
+
 constexpr int windowWidth = 1024;
 constexpr int windowHeight = 768;
 const std::string title = "Maotao";
@@ -39,7 +45,7 @@ class Menu
                  startBtnRec.y + (startBtnRec.height - startFontSize) / 2, startFontSize, WHITE);
     }
 
-    void update()
+    void update(GameState &currentState)
     {
         Vector2 mousePos = GetMousePosition();
 
@@ -49,7 +55,7 @@ class Menu
 
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
             {
-                // game start
+                currentState = GAME;
             }
         }
         else
@@ -139,17 +145,26 @@ int main()
     Menu menu;
     Grid grid(16, 16);
 
+    // track game state
+    GameState currentState = MENU;
+
     while (!WindowShouldClose())
     {
         BeginDrawing();
 
         ClearBackground(BLACK);
 
-        menu.update();
-        menu.draw();
-
-        grid.update();
-        grid.draw();
+        switch (currentState)
+        {
+        case MENU:
+            menu.update(currentState);
+            menu.draw();
+            break;
+        case GAME:
+            grid.update();
+            grid.draw();
+            break;
+        }
 
         EndDrawing();
     }
