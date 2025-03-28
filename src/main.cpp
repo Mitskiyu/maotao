@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <raylib.h>
 #include <string>
 #include <vector>
@@ -148,6 +149,28 @@ class Grid
         }
     }
 
+    void randomize()
+    {
+        for (int row = 0; row < rows; ++row)
+        {
+            for (int col = 0; col < cols; ++col)
+            {
+                cells[row][col] = (rand() / (float)RAND_MAX) < 0.25f ? 1 : 0;
+            }
+        }
+    }
+
+    void clear()
+    {
+        for (int row = 0; row < rows; ++row)
+        {
+            for (int col = 0; col < cols; ++col)
+            {
+                cells[row][col] = 0;
+            }
+        }
+    }
+
   private:
     const int rows;
     const int cols;
@@ -270,9 +293,13 @@ int main()
             grid.draw();
 
             if (IsKeyPressed(KEY_SPACE))
-            {
                 currentState = (currentState == GAME) ? PAUSED : GAME;
-            }
+
+            if (IsKeyPressed(KEY_R))
+                grid.randomize();
+
+            if (IsKeyPressed(KEY_C))
+                grid.clear();
 
             break;
         case PAUSED:
@@ -280,9 +307,7 @@ int main()
             grid.draw();
 
             if (IsKeyPressed(KEY_SPACE))
-            {
                 currentState = GAME;
-            }
 
             break;
         }
