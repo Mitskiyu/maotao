@@ -79,6 +79,40 @@ class Menu
 };
 
 //
+// :hud
+//
+class Hud
+{
+  public:
+    Hud()
+        : centerX(windowWidth / 2), controlsFontSize(16), pausedFontSize(24), paused("Paused, Space to Unpause"),
+          controls("Controls -> Space: Pause, C: Clear Grid, R: Randomize Grid"),
+          controlsPos({float(centerX) - float(MeasureText(controls.c_str(), controlsFontSize)) / 2, 745}),
+          pausedPos({float(centerX) - float(MeasureText(paused.c_str(), pausedFontSize)) / 2, 10})
+    {
+    }
+
+    void draw(GameState &currentState) const
+    {
+        if (currentState == PAUSED)
+        {
+            DrawText(paused.c_str(), pausedPos.x, pausedPos.y, pausedFontSize, WHITE);
+        }
+
+        DrawText(controls.c_str(), controlsPos.x, controlsPos.y, controlsFontSize, WHITE);
+    }
+
+  private:
+    const int centerX;
+    const int controlsFontSize;
+    const int pausedFontSize;
+    std::string paused;
+    std::string controls;
+    Vector2 controlsPos;
+    Vector2 pausedPos;
+};
+
+//
 // :grid
 //
 class Grid
@@ -272,6 +306,7 @@ int main()
     GameState currentState = MENU;
 
     Menu menu;
+    Hud hud;
     Grid grid(32, 32);
     Simulation sim(grid, currentState);
 
@@ -287,10 +322,12 @@ int main()
             menu.update(currentState);
             menu.draw();
             break;
+
         case GAME:
             sim.update(GetFrameTime());
             grid.update();
             grid.draw();
+            hud.draw(currentState);
 
             if (IsKeyPressed(KEY_SPACE))
                 currentState = (currentState == GAME) ? PAUSED : GAME;
@@ -305,9 +342,16 @@ int main()
         case PAUSED:
             grid.update();
             grid.draw();
+            hud.draw(currentState);
 
             if (IsKeyPressed(KEY_SPACE))
                 currentState = GAME;
+
+            if (IsKeyPressed(KEY_R))
+                grid.randomize();
+
+            if (IsKeyPressed(KEY_C))
+                grid.clear();
 
             break;
         }
